@@ -13,7 +13,7 @@ public class MainFrame extends JFrame{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public MainFrame(String name) {
+	public MainFrame(String name) throws IOException {
 		super(name + " demo");
 		double p1;
 		double p2;
@@ -194,6 +194,7 @@ public class MainFrame extends JFrame{
 		
 		
 		// brouke.getDataDyn(6.52, "BROUCKE-HENON", 5, 0.005);
+		brouke.getData(6.52, "BROUCKE-HENON", 0.005);
 		// figure_8.getDataDyn(6.324449, "FIGURE_8", 5, 0.005);
 		// BUTTERFLY_I.getDataDyn(6.235641, "BUTTERFLY_I", 5, 0.003);
 		// BUTTERFLY_II.getDataDyn(7.003907, "BUTTERFLY_II", 5, 0.004);
@@ -233,12 +234,6 @@ public class MainFrame extends JFrame{
     	
     	setVisible(true);
     	
-    	
-    
-    
-    
-	
-	
 	}
 
 	private static GLCapabilities createGLCapabilities() {

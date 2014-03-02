@@ -51,7 +51,7 @@ public class threeBody3d
 	String dir = "Data/";
 	
 	/**
-     * Creates a two body object based off of initial conditions
+     * Creates a three body object based off of initial conditions
 	  * and the masses involved. We will have default values
 	  * in the case we don't specify and for values inputed that do
 	  * not work.
@@ -348,48 +348,105 @@ public class threeBody3d
 		
 	}
 	
-	public void getData(double time, int steps, String Name) throws IOException {
+	public void getData(double time, String Name, double delta) throws IOException {
 		
-		bw = new BufferedWriter(new FileWriter(dir + Name + ".txt"));
-		double interval = time / steps;
+		double[] initial = {x_1, y_1, z_1, vx_1, vy_1, vz_1, x_2, y_2, z_2, vx_2, vy_2, vz_2,
+				x_3, y_3, z_3, vx_3, vy_3, vz_3};
+		
 		double[][] coefficients = new double[21][];
 		double[] evaluated = new double[21];
+		double current2;
+		double delta2;
+		double delta3;
+		double M;
+		double minimum_distance;
+		double current;
+		DecimalFormat df2 = new DecimalFormat("0.00000##");
+		String mag_string = "";
+	
+		bw = new BufferedWriter(new FileWriter(dir + Name + ".txt"));
 			
+		evaluated[18] = Math.sqrt((x_2 - x_1)*(x_2 - x_1) + 
+				   		   			  (y_2 - y_1)*(y_2 - y_1) + 
+				   		              (z_2 - z_1)*(z_2 - z_1));
+				
+		evaluated[19] = Math.sqrt((x_3 - x_1)*(x_3 - x_1) + 
+ 		   				  			  (y_3 - y_1)*(y_3 - y_1) + 
+ 		   				  			  (z_3 - z_1)*(z_3 - z_1));
+				
+		evaluated[20] = Math.sqrt((x_3 - x_2)*(x_3 - x_2) + 
+ 		   				  			  (y_3 - y_2)*(y_3 - y_2) + 
+ 		   				  			  (z_3 - z_2)*(z_3 - z_2));
+				
 		bw.write("0" + " " + x_1 + " " + y_1 + " " + z_1 + " " + 
 					             vx_1 + " " + vy_1 + " " + vz_1 + " " +
 					             x_2 + " " + y_2 + " " + z_2 + " " + 
 					             vx_2 + " " + vy_2 + " " + vz_2 + " " +
 					             x_3 + " " + y_3 + " " + z_3 + " " + 
 					             vx_3 + " " + vy_3 + " " + vz_3 + " ");
-		bw.write(Math.sqrt((x_2 - x_1)*(x_2 - x_1) + 
-							   (y_2 - y_1)*(y_2 - y_1) + 
-							   (z_2 - z_1)*(z_2 - z_1)) + " ");
-		bw.write(Math.sqrt((x_3 - x_1)*(x_3 - x_1) + 
-					           (y_3 - y_1)*(y_3 - y_1) + 
-					           (z_3 - z_1)*(z_3 - z_1)) + " ");
-		bw.write(Math.sqrt((x_3 - x_1)*(x_3 - x_1) + 
-			           		   (y_3 - y_1)*(y_3 - y_1) + 
-			           		   (z_3 - z_1)*(z_3 - z_1)) + "\n");
+		bw.write(evaluated[18] + " ");
+		bw.write(evaluated[19] + " ");
+		bw.write(evaluated[20] + " \n");
+		 	
+		current = 0;
 			
-			
-		for (int i = 1; i <= steps; i++) {
-			coefficients = calculate_coefficients();
-			bw.write((i * interval) + " ");
+		while (current < time) {
 				
-			for (int k = 0; k <= 20; k++) {
-				evaluated[k] = utilities.calculate_function(coefficients[k], interval);
-				bw.write(evaluated[k] + " ");
+		    bw.write(current + " ");
+							
+			current2 = current;
+			minimum_distance = Math.abs(Math.min(Math.min(evaluated[18],evaluated[19]), evaluated[20]));
+					
+			// System.out.println("minimum_distance = " + minimum_distance);
+					
+			M = 6 / minimum_distance;
+					
+			// System.out.println("M = " + M);
+					
+			delta2 = delta / M;
+						
+			// System.out.println("Delta2 = " + delta2);
+			while (current2 < (current + delta - delta2)) {
+						
+				coefficients = calculate_coefficients();
+					
+				for (int k = 0; k <= 17; k++) evaluated[k] = utilities.calculate_function(coefficients[k], delta2);
+						
+				update(evaluated[0], evaluated[1], evaluated[2], evaluated[3],  evaluated[4], evaluated[5], 
+					   evaluated[6], evaluated[7], evaluated[8], evaluated[9],  evaluated[10], evaluated[11],
+					   evaluated[12], evaluated[13], evaluated[14], evaluated[15],  evaluated[16], evaluated[17]);
+						
+				current2 += delta2;
+						
+				// System.out.println("Current2 = " + current2);
+				
 			}
-			bw.write("\n");
-				
+					
+			current += delta;
+					
+			System.out.printf("Current Time = " + df2.format(current2) + "\t\t" + mag_string + "\n");
+			delta3 = current - current2;
+			coefficients = calculate_coefficients();
+					
+			for (int k = 0; k <= 20; k++) evaluated[k] = utilities.calculate_function(coefficients[k], delta3);
+					
 			update(evaluated[0], evaluated[1], evaluated[2], evaluated[3],  evaluated[4], evaluated[5], 
 				   evaluated[6], evaluated[7], evaluated[8], evaluated[9],  evaluated[10], evaluated[11],
 				   evaluated[12], evaluated[13], evaluated[14], evaluated[15],  evaluated[16], evaluated[17]);
+					
+					
+			for (int k = 0; k <= 20; k ++) bw.write(evaluated[k] + " ");
+					
+			bw.write("\n");
+				
+			}
+			bw.close();
+			
+			update(initial[0], initial[1], initial[2], initial[3],  initial[4], initial[5], 
+				   initial[6], initial[7], initial[8], initial[9],  initial[10], initial[11],
+			       initial[12], initial[13], initial[14], initial[15],  initial[16], initial[17]);
 		}
-		//bw.write("RESET");	
-		bw.close();
-		System.out.printf("Data Acquisition Complete \n");
-	}
+	
 	
 	public void getDataDyn(double time, String Name, double Breakpoint, double delta) throws IOException {
 		int flagger = 0;
