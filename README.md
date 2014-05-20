@@ -13,7 +13,7 @@ still need to import them and them to your workspace. This is actually a fairly 
 To add the user libraries, do the following
 
 1. Go to Eclipse ("Window" if on Windows) -> Preferences -> Java -> Build Path -> User Libraries 
-2. Click on "Import" and then click "Browser."
+2. Click on "Import" and then click "Browse."
 3. Navigate to your current Eclipse WorkSpace and go to the UserLibraries Folder
 4. Click the Library that matches your Operating System (e.g. jogl-Mac.userlibraries for MAC)
 5. Go to your package explorer and right click on your main project directory
